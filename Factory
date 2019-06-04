@@ -1,0 +1,21 @@
+#include <string>
+#include <vector>
+using namespace std;
+
+struct Person
+{
+  Person(int id, string name) : id(id), name(name) {}
+  int id;
+  string name;
+};
+
+class PersonFactory
+{
+private:
+  int current_id = 0;
+public:
+  Person create_person(const string& name)
+  {
+    return {current_id++, name};
+  }
+};
