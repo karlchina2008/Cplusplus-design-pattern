@@ -1,0 +1,77 @@
+#include <vector>
+#include <string>
+#include <unordered_set>
+#include <ctype.h>
+#include <iostream>
+
+using namespace std;
+
+struct Sentence
+{
+  struct WordToken
+  {
+    WordToken(bool capitalize) : capitalize(capitalize) {}
+    bool capitalize;
+  };
+  vector<const string*> sentence_map;
+  unordered_set<string> sentence_storage;
+  vector<WordToken> tokens;
+  int len;
+
+  Sentence(const string& text)
+  {
+    int i = 0, index = 0;
+    string temp = "";
+    while (i < text.size()) {
+        cout << text[i] << endl;
+        if (text[i] == ' ' || i == text.size() -1) {
+            if (i == text.size() -1) temp.push_back(text[i]);
+            sentence_map.push_back(&(*sentence_storage.insert(temp).first));
+            ++index;
+            cout << "Temp is: " << temp << endl;
+            temp.clear();
+            ++i;
+        } else {
+            temp.push_back(text[i]);
+            ++i;
+        }
+    }
+    for (int i = 0; i < index; ++i) {
+        tokens.push_back(WordToken(false));
+    }
+    len = index;
+    cout << len << endl;
+  }
+
+  WordToken& operator[](size_t index)
+  {
+    return tokens[index];
+  }
+
+  string convertToUpper(const string& text) {
+      string res;
+      for (auto& c : text) {
+          res.push_back(toupper(c));
+      }
+      return res;
+  }
+
+  string str()
+  {
+    string result = "";
+    for (int i = 0; i < len; ++i) {
+        if (tokens[i].capitalize == true) {
+            if (i != 0)
+                result += " " + convertToUpper(*sentence_map[i]);
+            else
+                result += convertToUpper(*sentence_map[i]);
+        } else {
+            if (i != 0)
+                result += " " + *sentence_map[i];
+            else
+                result += *sentence_map[i];
+        }
+    }
+    return result;
+  }
+};
