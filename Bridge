@@ -1,0 +1,43 @@
+#include <string>
+using namespace std;
+
+struct Renderer
+{
+    virtual string what_to_render_as(const string&) const = 0;
+};
+
+struct RasterRenderer : Renderer {
+    RasterRenderer() = default;
+    string what_to_render_as(const string& shape) const override {
+        return "Drawing " + shape +  " as pixels";
+    }
+};
+
+struct VectorRenderer : Renderer {
+    VectorRenderer() = default;
+    string what_to_render_as(const string& shape) const override {
+        return "Drawing " + shape +  " as lines";
+    }
+};
+
+struct Shape
+{
+    string name;
+    const Renderer& renderer;
+    Shape(string name, const Renderer& renderer) : name(name), renderer(renderer) {}
+    string str() const {
+        return renderer.what_to_render_as(name);
+    }
+};
+
+struct Triangle : Shape
+{
+    Triangle(const Renderer& renderer) : Shape("Triangle", renderer)
+    {}
+};
+
+struct Square : Shape
+{
+    Square(const Renderer& renderer) : Shape("Square", renderer)
+    {}
+};
