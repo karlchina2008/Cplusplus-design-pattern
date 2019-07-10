@@ -1,0 +1,49 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+struct ContainsIntegers {
+    virtual int sum() = 0;
+};
+
+struct SingleValue : public ContainsIntegers
+{
+  int value{ 0 };
+
+  SingleValue() = default;
+  
+  int sum() override {
+      return value;
+  }
+
+  explicit SingleValue(const int value)
+    : value{value}
+  {
+  }
+};
+
+struct ManyValues : vector<int>, ContainsIntegers
+{
+  void add(const int value)
+  {
+    push_back(value);
+  }
+  
+  int sum() override {
+      int res = 0;
+      for (auto item : *this) {
+          res += item;
+      }
+      return res;
+  }
+};
+
+int sum(const vector<ContainsIntegers*> items)
+{
+    int res = 0;
+    for (auto& item : items) {
+        res += item->sum();
+    }
+    return res;
+}
