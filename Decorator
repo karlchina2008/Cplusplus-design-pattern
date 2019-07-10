@@ -1,0 +1,55 @@
+#include <string>
+#include <sstream>
+using namespace std;
+
+struct Flower
+{
+  virtual string str() = 0;
+};
+
+struct Rose : Flower
+{
+  string str() override {
+    ostringstream oss;
+    oss << "A rose";
+    return oss.str();
+  }
+};
+
+struct RedFlower : Flower
+{
+    Flower& flower_;
+    RedFlower(Flower& flower) : flower_(flower) {}
+    string str() override {
+        ostringstream oss;
+        if (flower_.str().find("that is") == string::npos) {
+            oss << flower_.str() << " that is red";
+        } else {
+            if (flower_.str().find("red") == string::npos) {
+                oss << flower_.str() << " and red";
+            } else {
+                oss << flower_.str();
+            }
+        }
+        return oss.str();
+    }
+};
+
+struct BlueFlower : Flower
+{
+    Flower& flower_;
+    BlueFlower(Flower& flower) : flower_(flower) {}
+    string str() override {
+        ostringstream oss;
+        if (flower_.str().find("that is") == string::npos) {
+            oss << flower_.str() << " that is blue";
+        } else {
+            if (flower_.str().find("blue") == string::npos) {
+                oss << flower_.str() << " and blue";
+            } else {
+                oss << flower_.str();
+            }
+        }
+        return oss.str();
+    }
+};
