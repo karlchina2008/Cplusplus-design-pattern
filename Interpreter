@@ -1,0 +1,95 @@
+#include <vector>
+#include <map>
+#include <string>
+#include <stdlib.h>
+#include <ctype.h>
+#include <iostream>
+
+using namespace std;
+struct Token {
+  enum Type {num, cha, plus, minus, not_known} type;
+  string text;
+  
+  Token(Type type, string text) : type(type), text(text) {}
+  
+  static std::vector<Token> lexing(const string& expression) {
+      vector<Token> results;
+      int i = 0;
+      while(i < expression.size()) {
+          switch(expression[i]) {
+              case '+':
+                results.push_back(Token{Type::plus, "+"});
+                ++i;
+                break;
+              case '-':
+                results.push_back(Token{Type::minus, "-"});
+                ++i;
+                break;
+              default:
+                if (isdigit(expression[i])) {
+                    string num = "";
+                    while (isdigit(expression[i]) && i < expression.size()) {
+                        num.push_back(expression[i++]);
+                    }
+                    results.push_back(Token{Type::num, num});
+                } else if (isalpha(expression[i])) {
+                    string  ch = "";
+                    while(isalpha(expression[i]) && i < expression.size()) {
+                        ch.push_back(expression[i++]);
+                    }
+                    results.push_back(Token{Type::cha, ch});
+                } else {
+                    ++i;
+                    results.push_back(Token(Type::not_known, ""));
+                }
+          }
+      }
+      return results;
+  }   
+};
+
+struct ExpressionProcessor
+{
+  std::map<char,int> variables;
+  
+
+  int calculate(const string& expression)
+  {
+    std::vector<Token> tokens = Token::lexing(expression);
+    int result = 0;
+    Token::Type prev_type;
+    for (auto& token : tokens) {
+        cout << token.text << endl;
+        switch(token.type) {
+            case Token::Type::num:
+              if (prev_type == Token::Type::minus) {
+                  result -= std::stoi(token.text);
+              } else {
+                  result += std::stoi(token.text);
+              }
+              prev_type = Token::Type::num;
+              break;
+            case Token::Type::cha:
+              if (token.text.size() > 1 || variables.find(token.text[0]) == variables.end()) {
+                  return 0;
+              }
+              if (prev_type == Token::Type::minus) {
+                  result -= variables[token.text[0]];
+              } else {
+                  result += variables[token.text[0]];
+              }
+              prev_type = Token::Type::cha;
+              break;
+            case Token::Type::plus:
+              prev_type = Token::Type::plus;
+              break;
+            case Token::Type::minus:
+              prev_type = Token::Type::minus;
+              break;
+            case Token::Type::not_known:
+              return 0;
+        }
+    }
+    return result;
+  }
+};
