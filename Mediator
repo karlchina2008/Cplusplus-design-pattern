@@ -1,0 +1,37 @@
+#include <vector>
+
+struct IParticipant {
+    virtual void say(int value) = 0;
+    virtual void receive (int value) = 0;
+};
+
+struct Mediator {
+    std::vector<IParticipant*> participants;
+    void broadcast(IParticipant* speaker, int value) {
+        for(auto* participant : participants) {
+            if (participant != speaker) {
+                participant->receive(value);
+            }
+        }
+    }
+};
+
+struct Participant : IParticipant
+{
+    int value{0};
+    Mediator& mediator;
+
+    Participant(Mediator &mediator) : mediator(mediator)
+    {
+      mediator.participants.push_back(this);
+    }
+
+    void say(int value) override
+    {
+        mediator.broadcast(this, value);
+    }
+    
+    void receive(int val) override {
+        value += val;
+    }
+};
