@@ -1,0 +1,53 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct IRat {
+    virtual int get_attack() = 0;
+    virtual void set_attack(int) = 0;
+};
+
+struct Game
+{
+    vector<IRat*> rats;
+    void add(IRat* rat) {
+        rats.push_back(rat);
+        update_attack();
+    }
+    
+    void remove(IRat* rat) {
+        rats.erase(std::remove(rats.begin(), rats.end(), rat), rats.end());
+        update_attack();
+    }
+    
+    void update_attack() {
+        for(auto* r : rats) {
+            r->set_attack(rats.size());
+        }        
+    }
+};
+
+struct Rat : IRat
+{
+    Game& game;
+    int attack{1};
+
+    Rat(Game &game) : game(game)
+    {
+      game.add(this);
+    }
+    
+    int get_attack() override {
+        return attack;
+    }
+    
+    void set_attack(int other_attack) override {
+        attack = other_attack;
+    }
+
+    ~Rat() 
+    { 
+        game.remove(this);
+    }
+};
