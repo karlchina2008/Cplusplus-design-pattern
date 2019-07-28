@@ -1,0 +1,48 @@
+#include <iostream>
+#include <vector>
+#include <complex>
+#include <tuple>
+#include <cmath>
+using namespace std;
+using namespace std::complex_literals;
+
+struct DiscriminantStrategy
+{
+    virtual double calculate_discriminant(double a, double b, double c) = 0;
+};
+
+struct OrdinaryDiscriminantStrategy : DiscriminantStrategy
+{
+    double calculate_discriminant (double a, double b, double c) override {
+        return b*b - 4*a*c;
+    }
+};
+
+struct RealDiscriminantStrategy : DiscriminantStrategy
+{
+    double calculate_discriminant(double a, double b, double c) override {
+        double res = b*b - 4*a*c;
+        if (res >= 0) return res;
+        return nan("");
+    }
+};
+
+class QuadraticEquationSolver
+{
+    DiscriminantStrategy& strategy;
+public:
+    QuadraticEquationSolver(DiscriminantStrategy &strategy) : strategy(strategy) {}
+
+    tuple<complex<double>, complex<double>> solve(double a, double b, double c)
+    {
+        // if (a == 0 && b != 0) {
+        //     return {-c/b, -c/b};
+        // }
+        // if (a == 0 && b == 0) {
+        //     return {nan(""), nan("")};
+        // }
+        double dis = strategy.calculate_discriminant(a, b, c);
+        complex<double> temp = sqrt(complex<double>(dis));
+        return make_tuple((-b + temp)/(2*a), (-b - temp)/(2 * a));
+    }
+};
